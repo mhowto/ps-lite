@@ -1,0 +1,48 @@
+@startuml
+
+class Postoffice {
+    - van_: Van*
+    - mu_: mutex
+    - customers_: unordered_map<int, unordered_map<int, Customer*>>
+    - node_ids_: unordered_map<int, vector<int>>
+    - server_key_ranges_mu_: mutex
+    - server_key_ranges_: vector<Range>
+    - is_worker_, is_server_, is_scheduler_: bool
+    - num_servers_, num_workers_: int
+    - barrier_done_: unordered_map<int, unordered_map<int, bool>>
+    - verbose_: int
+    - barrier_mu_: mutex
+    - barrier_cond_: condition_variable
+    - heartbeat_mu_: mutex
+    - start_mu_: mutex
+    - init_stage_: int
+    - heartbeats_: unordered_map<int, time_t>
+    - exit_callback_: Callback
+    - env_ref_: shared_ptr<Environment>
+    - start_time: time_t
+
+    - InitEnvironment: void()
+
+    + Get(): Postoffice*
+    + van(): Van*
+    + Start(int customer_id, const char* argv0, const bool do_barrier): void
+    + Finalize(customer_id, do_barrier): void
+    + AddCustomer(Customer* customer): void
+    + RemoveCustomer(customer): void
+    + GetCustomer(app_id, customer_id, timeout): Customer*
+    + GetNodeIDs(int )
+    + GetServerKeyRanges(): const Vector<Range>&
+    + RegisterExitCallback(const Callback&)
+    + WorkerRankToID(int rank): void
+    + ServerRankToID(int rank): int
+    + IDToRank(int id): int
+    + my_rank(): int
+    + is_worker(): int
+    + is_recovery(): bool
+    + Barrier(int customer_id, int node_group): void
+    + Manage(const Message& recv): void
+    + UpdateHeartbeat(int node_id, time_t t): void
+    + GetDeadNodes(int t): vector<int>
+}
+
+@enduml
